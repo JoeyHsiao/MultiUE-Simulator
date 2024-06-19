@@ -1,0 +1,44 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+
+network_ifstatus_monitor ()
+{
+    while true; do
+        if [ ! -z "$(ifstatus wan | grep up | grep true)"  ]; then
+            cur_ip="$(ifstatus wan | grep \"address\" | cut -d'"' -f4 )"
+            if [ "$cur_ip" == "" ]; then
+                echo -n 1 > /data/xq3/net_ifstatus_state
+            else
+                echo -n $cur_ip > /data/xq3/net_ifstatus_state
+            fi
+        else
+            echo -n 0 > /data/xq3/net_ifstatus_state
+        fi
+        sleep 2
+    done
+}
+
+network_md_monitor ()
+{
+    while true; do
+        mipc_wan2_cli mipc_wan_cli2 --at_cmd AT+EREG? | grep AT | awk -F': ' '{print $2}'  > /data/xq3/net_md_state
+        sleep 1
+    done
+}
+
+start()
+{
+    mkdir /data/xq3
+    mipc_wan2_cli --at_cmd AT+EGMR=0,7 | grep "AT res" | awk -F'"' '{print $2}' > /data/xq3/imei
+    echo -n 0 > /data/xq3/net_ifstatus_state
+    echo -n UNKNOWN > /data/xq3/net_md_state
+
+    # disable WU9 wifi
+    /usr/bin/nxp_wifi_power_off.sh
+
+    # run daemon
+    echo -n 0 > /data/xq3/net_ifstatus_state
+    network_ifstatus_monitor &
+    network_md_monitor &
+}

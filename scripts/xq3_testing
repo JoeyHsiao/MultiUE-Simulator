@@ -1,0 +1,106 @@
+#!/bin/sh
+
+run_wo_daemon ()
+{
+    . /xq3_remove_CRLF.sh
+    . /xq3_execute.sh
+}
+
+run_daemon ()
+{
+    . /xq3_remove_CRLF.sh
+    while true; do
+        start-stop-daemon -b -S sh /xq3_execute.sh
+        if [ "$?" = "0" ] || [ ! -z "$(ps | grep xq3_execute | grep -v grep)" ]; then
+            break
+        fi
+    done
+}
+
+run ()
+{
+    if [ ! -z "$(cat /xq3_execute_config | grep daemon | grep True)" ]; then
+        run_daemon
+    else
+        run_wo_daemon
+    fi
+}
+
+stop()
+{
+    xq3_execute_pid="$(ps | grep xq3_execute | grep -v grep | awk '{print $1}')"
+    if [ ! -z "$xq3_execute_pid" ]; then
+        kill -9 $xq3_execute_pid
+    fi
+    if [ ! -z "$(ps | grep iperf3 | grep -v grep)" ]; then
+        killall iperf3
+    fi
+}
+
+status()
+{
+    if [ ! -z "$(ps | grep xq3_execute | grep -v grep)" ]; then
+        echo "running"
+    else
+        echo "stop"
+    fi
+}
+
+result()
+{
+    if [ -z "$(ps | grep xq3_execute | grep -v grep)" ]; then
+        echo "====== Testing not start ======"
+        exit
+    fi
+
+    if [ ! -f "/xq3_logs_file" ]; then
+        echo "====== Logs file disappear ======"
+        exit
+    fi
+
+    log_name=$(cat /xq3_logs_file | tail -n 1)
+
+    if [ ! -f "/data/$log_name" ]; then
+        echo "====== Readonly system ======"
+    else
+        cat /data/$log_name | tail -n 10
+    fi
+    
+}
+
+info()
+{
+    if [ -f /xq3_execute_config ]; then
+        test_type=$(cat /xq3_execute_config | grep "type=" | awk -F '=' '{print $2}' | sed 's/\r$//' | tr -d ' ')
+        test_port=$(cat /xq3_execute_config | grep "port=" | awk -F '=' '{print $2}' | sed 's/\r$//' | tr -d ' ')
+
+        if [ -z "$test_port" ]; then
+            echo "ping"
+            exit
+        fi
+
+        echo "${test_type}_${test_port}"
+    fi
+}
+
+collect_logs()
+{
+    first_log="$(cat /xq3_logs_file | head -n 1)"
+    if [ ! -z "$(echo $first_log | grep ping)" ]; then
+        result_log_name="result_ping_"$(echo $first_log | awk -F '_' '{print $NF}' | sed 's/\r$//' | tr -d ' ')
+
+        for line in $(cat /xq3_logs_file); do
+            cat /data/$line | grep "64 bytes" >> /data/$result_log_name
+        done
+    elif [ ! -z "$(echo $first_log | grep iperf)" ]; then
+        result_log_name="result_iperf3_"$(echo $first_log | awk -F '_' '{print $2"_"$3}' | sed 's/\r$//' | tr -d ' ')"_"$(echo $first_log | awk -F '_' '{print $NF}' | sed 's/\r$//' | tr -d ' ')
+
+        for line in $(cat /xq3_logs_file); do
+            if [ ! -z "$(cat /data/$line)" ]; then
+                cat /data/$line | grep "sec" >> /data/$result_log_name
+            fi
+        done
+    fi
+}
+
+$1

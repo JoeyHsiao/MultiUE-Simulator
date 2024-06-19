@@ -1,0 +1,9 @@
+[
+	{
+		"mcc": 1,
+		"mnc": 1,
+		"apn": "internet",
+		"protocol": 1,
+		"roaming_protocol": 1
+	}
+]
