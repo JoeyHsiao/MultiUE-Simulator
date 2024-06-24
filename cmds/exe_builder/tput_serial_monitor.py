@@ -31,7 +31,7 @@ class MonitorThread(threading.Thread):
     def __init__(self, comPort):
         super().__init__()
         self.ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=2, timeout=1, rtscts=False, dsrdtr=False, write_timeout=1)
-        self.imsi=self.RunCmdToGetImsi()
+        self.imsi=self.RunCmdToGetImei()
         self.comPort = comPort
         self.deviceStatus = DeviceStatus.disconnect
         self.dlTput = 0
@@ -100,7 +100,7 @@ class MonitorThread(threading.Thread):
                 time.sleep(1)
                 continue
 
-    def RunCmdToGetImsi(self):
+    def RunCmdToGetImei(self):
         output = RunCmd(self.ser, port, "AT+EGMR=0,7\r")
         print(output)
         return output.split('"')[1]
@@ -130,14 +130,11 @@ threads = []
 devices_num=len(etsPorts)
 index=1
 for port in etsPorts:
-    print(port)
     thread = MonitorThread(port)
     thread.start()
-    print("Add to list")
     threads.append(thread)
     initialPrec=(index*100)/devices_num
     os.system('cls' if os.name == 'nt' else 'clear')
-    print(etsPorts)
     print("Initializing ... " + str(initialPrec) + "%")
     index+=1
 
