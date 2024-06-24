@@ -19,6 +19,10 @@ run_daemon ()
 
 run ()
 {
+    swapoff -a
+    sync
+    swapon /dev/zram0
+    
     if [ ! -z "$(cat /xq3_execute_config | grep daemon | grep True)" ]; then
         run_daemon
     else
