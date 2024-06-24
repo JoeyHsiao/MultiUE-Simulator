@@ -11,7 +11,7 @@ set "device_count=0"
 for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr /r /b /c:"[0-9A-Za-z]"') do (
     echo %%a
 
-    start "%%a" cmd /c "%root_folder%\cmds\cmd_init_device.cmd start "%%a"
+    start "%%a" cmd /c "%root_folder%\cmds\cmd_init_device.cmd %%a"
 )
 
 echo Wait all devices reboot
