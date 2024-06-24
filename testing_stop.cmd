@@ -10,6 +10,7 @@ for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr 
     echo %%a
 
     %root_folder%\adb_tool\adb -s %%a shell /etc/init.d/xq3_testing stop
+    %root_folder%\adb_tool\adb -s %%a shell "killall iperf3 lftp axel  > /dev/null 2>&1"
 )
 
 endlocal
