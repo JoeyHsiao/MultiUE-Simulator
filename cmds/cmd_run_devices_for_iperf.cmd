@@ -5,8 +5,8 @@ if "!IPERF%iperf_index%_UE_NUM!"=="" (
 )
 set "need_run_device_num=!IPERF%iperf_index%_UE_NUM!"
 
-set "default_iperf_udp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP -u CMD_PORT CMD_UDP_BITRATE CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /data/xq3/net_ifstatus_state)" = "0" ]; then break; fi ;done"
-set "default_iperf_tcp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP CMD_PORT CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /data/xq3/net_ifstatus_state)" = "0" ]; then break; fi ;done"
+set "default_iperf_udp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP -u CMD_PORT CMD_UDP_BITRATE CMD_LENGTH CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /data/var/net_ifstatus_state)" = "0" ]; then break; fi ;done"
+set "default_iperf_tcp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP CMD_PORT CMD_LENGTH CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /data/var/net_ifstatus_state)" = "0" ]; then break; fi ;done"
 
 : CMD_IP CMD_TYPE CMD_PORT CMD_UDP_BITRATE CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME
 set "server_ip=!IPERF%iperf_index%_SERVER_IP!"
@@ -19,6 +19,7 @@ set "testing_omit=!IPERF%iperf_index%_OMIT!"
 set "testing_time=!IPERF%iperf_index%_TIME!"
 set "testing_times=!IPERF%iperf_index%_TIMES!"
 set "run_daemon=!IPERF%iperf_index%_RUN_DAEMON!"
+set "length=!IPERF%iperf_index%_LENGTH!"
 
 echo iperf_%iperf_index%
 echo server_ip=%server_ip%
@@ -30,6 +31,7 @@ echo testing_direct=%testing_direct%
 echo testing_omit=%testing_omit%
 echo testing_time=%testing_time%
 echo testing_times=%testing_times%
+echo length=%length%
 echo run_daemon=%run_daemon%
 
 if "%testing_time%" == "" (
@@ -74,6 +76,12 @@ if "%protocol_type%" == "UDP" (
 
 set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:CMD_IP=%server_ip%!"
 set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:CMD_PORT=-p %iperf_port%!"
+
+if "%length%" == "" (
+    set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:CMD_LENGTH=!"
+) else (
+    set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:CMD_LENGTH=-l %length%!"
+)
 
 if "%udp_bitrate%" == "" (
     set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:CMD_UDP_BITRATE=!"
