@@ -10,6 +10,12 @@ set "keep_time=300"
 call "%root_folder%\cmds\cmd_get_config_value.cmd"
 call "%root_folder%\cmds\cmd_wait_adb_all.cmd"
 
+: clean UE logs and tmp files 
+del /Q %root_folder%\tmp\*
+for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr /r /b /c:"[0-9A-Za-z]"') do (
+    %root_folder%\adb_tool\adb -s %%a shell "rm *xq3* /data/iperf3* /data/ping* /data/http* /data/ftp* /data/xq3* > /dev/null 2>&1"
+)
+
 REM Release all devices netwrok
 set "device_count=0"
 for %%i in (%device_serial_list%) do (
