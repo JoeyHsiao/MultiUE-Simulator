@@ -7,7 +7,7 @@ for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr 
         set script_run_or_network_disconnect=1
     )
 
-    for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %%a shell cat /data/xq3/net_ifstatus_state`) do (
+    for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %%a shell cat /var/xq3/net_ifstatus_state`) do (
         if "%%b"=="0" (
             set script_run_or_network_disconnect=1
         )

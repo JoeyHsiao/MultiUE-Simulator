@@ -14,7 +14,7 @@ echo %testing_command%
 
 echo Waiting network connect ...
 :FOR_LOOP_FOR_WAIT_NETWORK_CONNECT
-for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %device_serial_name% shell cat /data/xq3/net_ifstatus_state`) do (
+for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %device_serial_name% shell cat /var/xq3/net_ifstatus_state`) do (
     if "%%b"=="0" (
         goto FOR_LOOP_FOR_WAIT_NETWORK_CONNECT
     ) else (

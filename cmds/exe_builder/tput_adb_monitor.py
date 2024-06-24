@@ -46,7 +46,7 @@ class MonitorThread(threading.Thread):
                 time.sleep(1)
                 continue
 
-            command = f"{adbPath} -s {self.adbDevice} shell cat /data/xq3/net_EDMFAPP_6_4"
+            command = f"{adbPath} -s {self.adbDevice} shell cat /var/xq3/net_EDMFAPP_6_4"
             result = RunCmd(command)
             if result == "":
                 time.sleep(1)
@@ -76,7 +76,7 @@ class MonitorThread(threading.Thread):
             else:
                 self.deviceStatus = DeviceStatus.NET_CONNECT
 
-                command = f"{adbPath} -s {self.adbDevice} shell cat /data/xq3/net_EDMFAPP_6_13_11"
+                command = f"{adbPath} -s {self.adbDevice} shell cat /var/xq3/net_EDMFAPP_6_13_11"
                 result = RunCmd(command)
                 if result == "":
                     time.sleep(1)
@@ -101,7 +101,7 @@ class MonitorThread(threading.Thread):
                 continue
 
     def RunCmdToGetImei(self):
-        command = f"{adbPath} -s {self.adbDevice} shell cat /data/xq3/imei"
+        command = f"{adbPath} -s {self.adbDevice} shell cat /var/xq3/imei"
         result = RunCmd(command)
         return result[0]
 
