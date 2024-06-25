@@ -5,8 +5,6 @@ set "root_folder=%~dp0"
 
 copy %root_folder%\configs\config_NT_1-2-3.ini %root_folder%\_config.ini
 
-set "iperf_server_ip=10.45.0.1"
-
 call "%root_folder%\cmds\cmd_get_config_value.cmd"
 call "%root_folder%\cmds\cmd_wait_adb_all.cmd"
 
