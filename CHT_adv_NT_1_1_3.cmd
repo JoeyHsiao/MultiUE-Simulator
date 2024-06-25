@@ -15,6 +15,8 @@ call "%root_folder%\cmds\cmd_wait_adb_all.cmd"
 
 call "%root_folder%\cmds\cmd_run_devices_for_http.cmd"
 call "%root_folder%\cmds\cmd_run_devices_for_ftp.cmd"
+set "iperf_index=1"
+call "%root_folder%\cmds\cmd_run_devices_for_iperf.cmd"
 
 
 endlocal
