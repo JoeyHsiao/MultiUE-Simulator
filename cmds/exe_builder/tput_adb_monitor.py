@@ -3,6 +3,7 @@ import threading
 from enum import Enum
 import os
 import subprocess
+import sys
 
 class DeviceStatus(Enum):
     NO_ADB_DEVICES = 1
@@ -122,8 +123,8 @@ class MonitorThread(threading.Thread):
         tput = ((self.ulTput/1024.000)*8)/1024.000
         return tput
 
-currentPath = os.getcwd()
-adbPath = os.path.join(currentPath, "adb_tool", "adb")
+root_path = sys.argv[1]
+adbPath = os.path.join(root_path, "adb_tool", "adb")
 
 # Get ETS COM ports
 adbDevices = GetAdbDevices()
