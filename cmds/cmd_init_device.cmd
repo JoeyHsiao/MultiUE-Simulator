@@ -26,12 +26,15 @@ if "%GENERAL_NARFCN%" == "" (
 )
 
 %root_folder%\adb_tool\adb -s %device_serial_name% push %root_folder%\scripts\default_apn.json /etc/
+%root_folder%\adb_tool\adb -s %device_serial_name% shell "sed -i 's/\r//' /etc/default_apn.json"
 
 %root_folder%\adb_tool\adb -s %device_serial_name% push %root_folder%\scripts\xq3_monitor_daemon /etc/init.d/
+%root_folder%\adb_tool\adb -s %device_serial_name% shell "sed -i 's/\r//' /etc/init.d/xq3_monitor_daemon"
 %root_folder%\adb_tool\adb -s %device_serial_name% shell chmod +x /etc/init.d/xq3_monitor_daemon
 %root_folder%\adb_tool\adb -s %device_serial_name% shell ln -s /etc/init.d/xq3_monitor_daemon /etc/rc.d/S99xq3_monitor_daemon
 
 %root_folder%\adb_tool\adb -s %device_serial_name% push %root_folder%\scripts\xq3_testing /etc/init.d/
+%root_folder%\adb_tool\adb -s %device_serial_name% shell "sed -i 's/\r//' /etc/init.d/xq3_testing"
 %root_folder%\adb_tool\adb -s %device_serial_name% shell chmod +x /etc/init.d/xq3_testing
 
 %root_folder%\adb_tool\adb -s %device_serial_name% push %root_folder%\scripts\lftp /usr/bin/

@@ -2,13 +2,11 @@
 
 run_wo_daemon ()
 {
-    . /xq3_remove_CRLF.sh
     . /xq3_execute.sh
 }
 
 run_daemon ()
 {
-    . /xq3_remove_CRLF.sh
     while true; do
         start-stop-daemon -b -S sh /xq3_execute.sh
         if [ "$?" = "0" ] || [ ! -z "$(ps | grep xq3_execute | grep -v grep)" ]; then
