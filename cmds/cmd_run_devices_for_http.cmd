@@ -5,7 +5,7 @@ if "!HTTP_UE_NUM!"=="" (
 )
 set "need_run_device_num=!HTTP_UE_NUM!"
 
-set "default_http_dl_cmd=cd /data; TESTING_TIMES; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=http_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; curl -o /dev/null http://SERVER_IP/DL_FILE_NAME 2>&1 | tee /data/$filename; done"
+set "default_http_dl_cmd=cd /data; TESTING_TIMES; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=http_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; curl -o /dev/null http://SERVER_IP/DL_FILE_NAME 2>&1 | tee /data/$filename; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then break; fi ;done"
 : python not support http.server ul yet
 : curl -T test http://10.45.0.1:8000/home/ps/test
 

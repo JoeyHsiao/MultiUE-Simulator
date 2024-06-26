@@ -5,8 +5,8 @@ if "!IPERF%iperf_index%_UE_NUM!"=="" (
 )
 set "need_run_device_num=!IPERF%iperf_index%_UE_NUM!"
 
-set "default_iperf_udp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP -u CMD_PORT CMD_UDP_BITRATE CMD_LENGTH CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /data/var/net_ifstatus_state)" = "0" ]; then break; fi ;done"
-set "default_iperf_tcp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP CMD_PORT CMD_LENGTH CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /data/var/net_ifstatus_state)" = "0" ]; then break; fi ;done"
+set "default_iperf_udp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP -u CMD_PORT CMD_UDP_BITRATE CMD_LENGTH CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then break; fi ;done"
+set "default_iperf_tcp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP CMD_PORT CMD_LENGTH CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then break; fi ;done"
 
 : CMD_IP CMD_TYPE CMD_PORT CMD_UDP_BITRATE CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME
 set "server_ip=!IPERF%iperf_index%_SERVER_IP!"
