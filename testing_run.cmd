@@ -3,6 +3,8 @@ setlocal enabledelayedexpansion
 
 set "root_folder=%~dp0"
 
+copy %root_folder%\configs\config_general.ini %root_folder%\_config.ini
+
 call "%root_folder%\cmds\cmd_get_config_value.cmd"
 call "%root_folder%\cmds\cmd_wait_adb_all.cmd"
 

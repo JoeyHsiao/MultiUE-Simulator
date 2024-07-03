@@ -13,6 +13,8 @@ for /f "tokens=1,* delims=" %%a in ('type "%config_file%"') do (
         set section=FTP
     ) else if "%%a"=="[HTTP]" (
         set section=HTTP
+    ) else if "%%a"=="[RTT]" (
+        set section=RTT
     ) else if "%%a"=="[Iperf1]" (
         set section=IPERF1
     ) else if "%%a"=="[Iperf2]" (

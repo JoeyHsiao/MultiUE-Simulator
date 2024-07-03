@@ -5,8 +5,8 @@ if "!IPERF%iperf_index%_UE_NUM!"=="" (
 )
 set "need_run_device_num=!IPERF%iperf_index%_UE_NUM!"
 
-set "default_iperf_udp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP -u CMD_PORT CMD_UDP_BITRATE CMD_LENGTH CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; break; fi ;done"
-set "default_iperf_tcp_cmd=WHILE_FOR_LOOP; do cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP CMD_PORT CMD_LENGTH CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; break; fi ;done"
+set "default_iperf_udp_cmd=WHILE_FOR_LOOP; do killall iperf3; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP -u CMD_PORT CMD_UDP_BITRATE CMD_LENGTH CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
+set "default_iperf_tcp_cmd=WHILE_FOR_LOOP; do killall iperf3; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=iperf3_NAMETYPE_NAMEDIRECT_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; iperf3 -c CMD_IP CMD_PORT CMD_LENGTH CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME --timestamp='%%Y%%m%%d%%H%%M%%S ' --logfile /data/$filename; sleep 5; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
 
 : CMD_IP CMD_TYPE CMD_PORT CMD_UDP_BITRATE CMD_TCP_PARALLEL CMD_DIRECT CMD_OMIT CMD_TIME
 set "server_ip=!IPERF%iperf_index%_SERVER_IP!"
@@ -20,6 +20,7 @@ set "testing_time=!IPERF%iperf_index%_TIME!"
 set "testing_times=!IPERF%iperf_index%_TIMES!"
 set "run_daemon=!IPERF%iperf_index%_RUN_DAEMON!"
 set "length=!IPERF%iperf_index%_LENGTH!"
+set "stop_once_disconnect=!IPERF%iperf_index%_STOP_ONCE_DISCONNECT!"
 
 echo iperf_%iperf_index%
 echo server_ip=%server_ip%
@@ -33,6 +34,7 @@ echo testing_time=%testing_time%
 echo testing_times=%testing_times%
 echo length=%length%
 echo run_daemon=%run_daemon%
+echo stop_once_disconnect=%stop_once_disconnect%
 
 if "%testing_time%" == "" (
     set "testing_time=0"
@@ -125,6 +127,12 @@ if "%testing_time%" == "0" (
 ) else (
     set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:WHILE_FOR_LOOP=for i in $(seq 1 %testing_times%)!"
     set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:CMD_TIME=-t %testing_time%!"
+)
+
+if "%stop_once_disconnect%" == "True" (
+    set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:DO_BREAK=break;!"
+) else (
+    set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:DO_BREAK=!"
 )
 
 set "test_type=!test_protocol!-!test_driect!"
