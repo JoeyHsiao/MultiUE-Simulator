@@ -1,4 +1,4 @@
-
+@echo off
 setlocal enabledelayedexpansion
 
 set "root_folder=%~dp0"
