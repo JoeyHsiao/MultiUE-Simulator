@@ -47,7 +47,7 @@ class MonitorThread(threading.Thread):
                 time.sleep(1)
                 continue
 
-            command = f"{adbPath} -s {self.adbDevice} shell cat /var/xq3/net_EDMFAPP_6_4"
+            command = f"{adbPath} -s {self.adbDevice} shell cat /var/xq3/net_register_state"
             result = RunCmd(command)
             if result == "":
                 time.sleep(1)
@@ -56,21 +56,9 @@ class MonitorThread(threading.Thread):
             if len(result) < 1:
                 time.sleep(1)
                 continue
-            lineOne = result[0]
+            connectStatus = result[0]
 
-            lineOneSplitColon=lineOne.strip().split(": ")
-            if len(lineOneSplitColon) < 2:
-                time.sleep(1)
-                continue
-            lineOneValues=lineOneSplitColon[1]
-
-            lineTwoValuesSplitComma=lineOneValues.split(',')
-            if len(lineTwoValuesSplitComma) < 3:
-                time.sleep(1)
-                continue
-            connectStatus = lineTwoValuesSplitComma[2]
-
-            if connectStatus == "255":
+            if connectStatus != "MIPC_NW_REGISTER_STATE_HOME":
                 self.deviceStatus = DeviceStatus.NET_DISCONNECT
                 time.sleep(1)
                 continue
