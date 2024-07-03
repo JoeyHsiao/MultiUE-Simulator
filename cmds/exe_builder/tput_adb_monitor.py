@@ -65,7 +65,7 @@ class MonitorThread(threading.Thread):
             else:
                 self.deviceStatus = DeviceStatus.NET_CONNECT
 
-                command = f"{adbPath} -s {self.adbDevice} shell cat /var/xq3/net_EDMFAPP_6_13_11"
+                command = f"{adbPath} -s {self.adbDevice} shell cat /var/xq3/net_EDMFAPP_6_11_11"
                 result = RunCmd(command)
                 if result == "":
                     time.sleep(1)
@@ -84,8 +84,8 @@ class MonitorThread(threading.Thread):
 
                 lineTwoValuesSplitComma=lineTwoValues.split(',')
 
-                self.dlTput = int(lineTwoValuesSplitComma[3])
-                self.ulTput = int(lineTwoValuesSplitComma[2])
+                self.dlTput = int(lineTwoValuesSplitComma[2])
+                self.ulTput = int(lineTwoValuesSplitComma[4])
                 time.sleep(1)
                 continue
 
@@ -104,11 +104,11 @@ class MonitorThread(threading.Thread):
         return self.deviceStatus
 
     def GetDTput(self):
-        tput = ((self.dlTput/1024.000)*8)/1024.000
+        tput = ((self.dlTput/1024.000)*8)
         return tput
         
     def GetUTput(self):
-        tput = ((self.ulTput/1024.000)*8)/1024.000
+        tput = ((self.ulTput/1024.000)*8)
         return tput
 
 root_path = sys.argv[1]
@@ -149,11 +149,11 @@ while True:
         else:
             totalDTput+=thread.GetDTput()
             totalUTput+=thread.GetUTput()
-            printStr += f"DL: {thread.GetDTput():>8.3f} Mbits/s  UL: {thread.GetUTput():>8.3f} Mbits/s"
+            printStr += f"PDSCH: {thread.GetDTput():>8.3f} Mbits/s  PUSCH: {thread.GetUTput():>8.3f} Mbits/s"
 
         print(printStr)
 
-    print(f"\nTotal DL: {totalDTput:.3f} Mbits/s    Total UL: {totalUTput:.3f} Mbits/s")
-    time.sleep(5)
+    print(f"\nTotal PDSCH: {totalDTput:.3f} Mbits/s    Total PUSCH: {totalUTput:.3f} Mbits/s")
+    time.sleep(2)
 
         

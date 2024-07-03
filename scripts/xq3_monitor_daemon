@@ -34,8 +34,8 @@ network_md_monitor ()
         tmp=$(mipc_wan2_cli --show_register_status | sed 's/\r$//')
         echo -n "$tmp" > /var/xq3/net_register_state
         sleep 1
-        tmp=$(mipc_wan2_cli --at_cmd AT+EDMFAPP=6,13,11 | grep "AT res" | sed 's/\r$//')
-        echo -n "$tmp" > /var/xq3/net_EDMFAPP_6_13_11
+        tmp=$(mipc_wan2_cli --at_cmd AT+EDMFAPP=6,11,11 | grep "AT res" | sed 's/\r$//')
+        echo -n "$tmp" > /var/xq3/net_EDMFAPP_6_11_11
         sleep 1
     done
 }
