@@ -5,8 +5,8 @@ if "!FTP_UE_NUM!"=="" (
 )
 set "need_run_device_num=!FTP_UE_NUM!"
 
-set "default_ftp_dl_cmd=cd /data; rm FTP_DL_FILENAME; TESTING_TIMES; do killall lftp; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "get 'FTP_DL_FILENAME'; quit" | tee /data/$filename; rm FTP_DL_FILENAME; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
-set "default_ftp_ul_cmd=cd /data; rm xq3_ftp_ul_NAMEDEV; dd if=/dev/zero of=xq3_ftp_ul_NAMEDEV bs=FTP_UL_FILESIZE count=1; TESTING_TIMES; do killall lftp; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "put 'xq3_ftp_ul_NAMEDEV'; quit" | tee /data/$filename; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
+set "default_ftp_dl_cmd=mkdir /data/xq3; cd /data/xq3; rm FTP_DL_FILENAME; TESTING_TIMES; do killall lftp; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "get 'FTP_DL_FILENAME'; quit" | tee /data/xq3/$filename; rm FTP_DL_FILENAME; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
+set "default_ftp_ul_cmd=mkdir /data/xq3; cd /data/xq3; rm xq3_ftp_ul_NAMEDEV; dd if=/dev/zero of=xq3_ftp_ul_NAMEDEV bs=FTP_UL_FILESIZE count=1; TESTING_TIMES; do killall lftp; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "put 'xq3_ftp_ul_NAMEDEV'; quit" | tee /data/xq3/$filename; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
 : python not support ftp.server ul yet
 : curl -T test ftp://10.45.0.1:8000/home/ps/test
 
@@ -36,6 +36,7 @@ echo run_daemon=%run_daemon%
 echo stop_once_disconnect=%stop_once_disconnect%
 
 call "%root_folder%\cmds\cmd_wait_testing_device.cmd
+
 for %%i in (!can_run_devices!) do (
     echo %%i
     echo type=ftp > %root_folder%\tmp\xq3_execute_config_%%i

@@ -5,7 +5,7 @@ set "device_serial_name=%~1"
 
 set "root_folder=%~dp0\.."
 
-%root_folder%\adb_tool\adb -s %device_serial_name% shell "rm -rf *xq3* /data/* /etc/init.d/*xq3* /etc/rc.d/*xq3* /data/xq3/ > /dev/null 2>&1"
+%root_folder%\adb_tool\adb -s %device_serial_name% shell "rm -rf *xq3* /data/xq3/* > /dev/null 2>&1"
 
 %root_folder%\adb_tool\adb -s %device_serial_name% shell uci set network.wan.rattype=15
 %root_folder%\adb_tool\adb -s %device_serial_name% shell uci set network.wan.mode=1

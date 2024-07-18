@@ -34,9 +34,7 @@ stop()
     if [ ! -z "$xq3_execute_pid" ]; then
         kill -9 $xq3_execute_pid
     fi
-    if [ ! -z "$(ps | grep iperf3 | grep -v grep)" ]; then
-        killall iperf3
-    fi
+    killall iperf3 lftp axel curl
 }
 
 status()
@@ -62,10 +60,10 @@ result()
 
     log_name=$(cat /xq3_logs_file | tail -n 1)
 
-    if [ ! -f "/data/$log_name" ]; then
+    if [ ! -f "/data/xq3/$log_name" ]; then
         echo "====== Readonly system ======"
     else
-        cat /data/$log_name | tail -n 10
+        cat /data/xq3/$log_name | tail -n 10
     fi
     
 }
@@ -92,14 +90,14 @@ collect_logs()
         result_log_name="result_ping_"$(echo $first_log | awk -F '_' '{print $NF}' | sed 's/\r$//' | tr -d ' ')
 
         for line in $(cat /xq3_logs_file); do
-            cat /data/$line | grep "64 bytes" >> /data/$result_log_name
+            cat /data/xq3/$line | grep "64 bytes" >> /data/xq3/$result_log_name
         done
     elif [ ! -z "$(echo $first_log | grep iperf)" ]; then
         result_log_name="result_iperf3_"$(echo $first_log | awk -F '_' '{print $2"_"$3}' | sed 's/\r$//' | tr -d ' ')"_"$(echo $first_log | awk -F '_' '{print $NF}' | sed 's/\r$//' | tr -d ' ')
 
         for line in $(cat /xq3_logs_file); do
             if [ ! -z "$(cat /data/$line)" ]; then
-                cat /data/$line | grep "sec" >> /data/$result_log_name
+                cat /data/xq3/$line | grep "sec" >> /data/xq3/$result_log_name
             fi
         done
     fi
