@@ -5,7 +5,7 @@ if "!PING_UE_NUM!"=="" (
 )
 set "need_run_device_num=!PING_UE_NUM!"
 
-set "default_rtt_cmd=cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=rtt_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; netperf -t TYPE_RR -H SERVER_IP -l TESTING_TIME -o min_latency,max_latency,mean_latency -- -r TEST_SIZE,TEST_SIZE > /data/$filename"
+set "default_rtt_cmd=mkdir /data/xq3; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=rtt_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; netperf -t TYPE_RR -H SERVER_IP -l TESTING_TIME -o min_latency,max_latency,mean_latency -- -r TEST_SIZE,TEST_SIZE > /data/xq3/$filename"
 
 : print rtt config settings
 set "server_ip=!RTT_SERVER_IP!"

@@ -22,13 +22,13 @@ for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr 
     
     %root_folder%\adb_tool\adb -s %%a shell /etc/init.d/xq3_testing collect_logs
 
-    for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %%a shell "ls /data/result_* | xargs -n 1 basename"`) do (
+    for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %%a shell "ls /data/xq3/result_* | xargs -n 1 basename"`) do (
         set "log_name=%%b"
     )
     set "log_name=!log_name:~0,-1!"
 
     echo !log_name!
-    %root_folder%\adb_tool\adb -s %%a pull /data/!log_name! %foldername%/
+    %root_folder%\adb_tool\adb -s %%a pull /data/xq3/!log_name! %foldername%/
     
 )
 

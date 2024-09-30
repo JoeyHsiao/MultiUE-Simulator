@@ -9,7 +9,7 @@ set "root_folder=%~dp0"
 %root_folder%\..\adb_tool\adb -s %device_serial_name% shell chmod +x /usr/lib/libreadline.so.8.1
 %root_folder%\..\adb_tool\adb -s %device_serial_name% shell ln -s /usr/lib/libreadline.so.8.1  /usr/lib/libreadline.so.8
 
-%root_folder%\..\adb_tool\adb -s %device_serial_name% shell killall iperf3 lftp axel
+%root_folder%\..\adb_tool\adb -s %device_serial_name% shell killall iperf3 lftp axel curl
 
 %root_folder%\..\adb_tool\adb -s %device_serial_name% push %root_folder%\..\tmp/xq3_execute_config_%device_serial_name% /xq3_execute_config
 %root_folder%\..\adb_tool\adb -s %device_serial_name% shell "sed -i 's/\r//' /xq3_execute_config"

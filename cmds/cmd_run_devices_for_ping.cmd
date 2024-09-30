@@ -5,7 +5,7 @@ if "!PING_UE_NUM!"=="" (
 )
 set "need_run_device_num=!PING_UE_NUM!"
 
-set "default_ping_cmd=WHILE_FOR_LOOP; do killall ping; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ping_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; ping CMD > /data/$filename; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
+set "default_ping_cmd=mkdir /data/xq3; WHILE_FOR_LOOP; do killall ping; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ping_${cur_time}_NAMEDEV.log; echo $filename >> xq3_logs_file; ping CMD > /data/xq3/$filename; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
 
 : print ping config settings
 set "server_ip=!PING_SERVER_IP!"
