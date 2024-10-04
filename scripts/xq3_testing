@@ -96,7 +96,7 @@ collect_logs()
         result_log_name="result_iperf3_"$(echo $first_log | awk -F '_' '{print $2"_"$3}' | sed 's/\r$//' | tr -d ' ')"_"$(echo $first_log | awk -F '_' '{print $NF}' | sed 's/\r$//' | tr -d ' ')
 
         for line in $(cat /xq3_logs_file); do
-            if [ ! -z "$(cat /data/$line)" ]; then
+            if [ ! -z "$(cat /data/xq3/$line)" ]; then
                 cat /data/xq3/$line | grep "sec" >> /data/xq3/$result_log_name
             fi
         done
