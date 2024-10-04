@@ -11,9 +11,8 @@ del %root_folder%\tmp\*
 REM Run adb devices command and count the number of devices connected
 set "device_count=0"
 for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr /r /b /c:"[0-9A-Za-z]"') do (
-    echo %%a
-
-    %root_folder%\adb_tool\adb -s %%a shell "rm *xq3* /data/* > /dev/null 2>&1"
+    set "device_serial_name=%%a"
+    call "%root_folder%\cmds\cmd_remove_logs.cmd""
 )
 
 endlocal

@@ -144,9 +144,9 @@ set "default_iperf_cmd_%current_device%=!default_iperf_cmd_%current_device%:NAME
 echo !default_iperf_cmd_%current_device%! > %root_folder%\tmp\xq3_execute_%current_device%
 
     if "%OTHERS_WAIT_CMD_FINISH%" == "True" (
-        start "%current_device%" /wait cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %current_device%"
+        start "%current_device%" /wait cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %current_device% %remove_logs%"
     ) else (
-        start "%current_device%" cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %current_device%"
+        start "%current_device%" cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %current_device% %remove_logs%"
     )
 
 set /a "iperf_port+=1"

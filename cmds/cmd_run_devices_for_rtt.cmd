@@ -35,8 +35,8 @@ for %%i in (!can_run_devices!) do (
     echo !default_rtt_cmd_%%i! > %root_folder%\tmp\xq3_execute_%%i
 
     if "%OTHERS_WAIT_CMD_FINISH%" == "True" (
-        start "%%i" /wait cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %%i"
+        start "%%i" /wait cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %%i %remove_logs%"
     ) else (
-        start "%%i" cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %%i"
+        start "%%i" cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %%i %remove_logs%"
     )
 )

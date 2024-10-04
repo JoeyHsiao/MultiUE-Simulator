@@ -11,12 +11,10 @@ call "%root_folder%\cmds\cmd_wait_adb_all.cmd"
 : clean UE logs and tmp files
 mkdir %root_folder%\tmp
 del /Q %root_folder%\tmp\*
-for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr /r /b /c:"[0-9A-Za-z]"') do (
-    %root_folder%\adb_tool\adb -s %%a shell "rm *xq3* /data/xq3/* > /dev/null 2>&1"
-)
 
 echo .
 echo http
+set "remove_logs=True"
 call "%root_folder%\cmds\cmd_run_devices_for_http.cmd"
 
 REM Wait for 3600 seconds
@@ -33,6 +31,7 @@ for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr 
 
 echo .
 echo ftp
+set "remove_logs=False"
 call "%root_folder%\cmds\cmd_run_devices_for_ftp.cmd"
 
 REM Wait for 3600 seconds
