@@ -3,10 +3,10 @@ if "!FTP_UE_NUM!"=="" (
 ) else if "!FTP_UE_NUM!"=="0" (
     exit /B
 )
-set "need_run_device_num=!FTP_UE_NUM!"
+set "need_testing_device_num=!FTP_UE_NUM!"
 
-set "default_ftp_dl_cmd=mkdir /data/xq3; cd /data/xq3; rm FTP_DL_FILENAME; TESTING_TIMES; do killall lftp; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "get 'FTP_DL_FILENAME'; quit" | tee /data/xq3/$filename; rm FTP_DL_FILENAME; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
-set "default_ftp_ul_cmd=mkdir /data/xq3; cd /data/xq3; rm xq3_ftp_ul_NAMEDEV; dd if=/dev/zero of=xq3_ftp_ul_NAMEDEV bs=FTP_UL_FILESIZE count=1; TESTING_TIMES; do killall lftp; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; echo $filename >> /xq3_logs_file; lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "put 'xq3_ftp_ul_NAMEDEV'; quit" | tee /data/xq3/$filename; if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then echo "network_disconnect" >> /xq3_logs_file; DO_BREAK fi ;done"
+set "default_ftp_dl_cmd=cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; LOG_FILENAME_PRINT lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "get 'FTP_DL_FILENAME'; quit" LOG_PRINT; rm FTP_DL_FILENAME;"
+set "default_ftp_ul_cmd=dd if=/dev/zero of=xq3_ftp_ul_NAMEDEV bs=FTP_UL_FILESIZE count=1; cur_time=$(date '+%%Y%%m%%d_%%H%%M%%S'); filename=ftp_${cur_time}_NAMEDEV.log; LOG_FILENAME_PRINT lftp -u FTP_ACCOUNT,FTP_PWD SERVER_IP -e "put 'xq3_ftp_ul_NAMEDEV'; quit" LOG_PRINT;"
 : python not support ftp.server ul yet
 : curl -T test ftp://10.45.0.1:8000/home/ps/test
 
@@ -25,6 +25,10 @@ if "%testing_times%" == "" (
     set "testing_times=0"
 )
 
+if "%stop_once_disconnect%" == "" (
+    set "stop_once_disconnect=False"
+)
+
 echo server_ip=%server_ip%
 echo ftp_account=%ftp_account%
 echo ftp_pws=%ftp_pws%
@@ -37,40 +41,63 @@ echo stop_once_disconnect=%stop_once_disconnect%
 
 call "%root_folder%\cmds\cmd_wait_testing_device.cmd
 
-for %%i in (!can_run_devices!) do (
-    echo %%i
-    echo type=ftp > %root_folder%\tmp\xq3_execute_config_%%i
-    echo daemon=%run_daemon% >> %root_folder%\tmp\xq3_execute_config_%%i
+set "index=1"
 
-    if "%testing_direct%" == "DL" (
-        set "default_ftp_cmd_%%i=!default_ftp_dl_cmd:FTP_DL_FILENAME=%dl_filename%!"
-    ) else if "%testing_direct%" == "UL" (
-        set "default_ftp_cmd_%%i=!default_ftp_ul_cmd:FTP_UL_FILESIZE=%ul_filesize%!"
+:FTP_FOR_LOOP_FOR_RUN
+set "index_tmp=1"
+for %%i in (%free_devices%) do (
+    set "current_device=%%i"
+    if "!index!" == "!index_tmp!" (
+        goto FTP_GET_DEVICE_FINISH
     )
-
-    set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:FTP_ACCOUNT=%ftp_account%!"
-    set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:FTP_PWD=%ftp_pws%!"
-    set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:SERVER_IP=%server_ip%!"
-
-    if "%testing_times%" == "0" (
-        set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:TESTING_TIMES=while true!"
-    ) else (
-        set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:TESTING_TIMES=for i in $(seq 1 %testing_times%)!"
-    )
-
-    if "%stop_once_disconnect%" == "True" (
-        set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:DO_BREAK=break;!"
-    ) else (
-        set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:DO_BREAK=!"
-    )
-
-    set "default_ftp_cmd_%%i=!default_ftp_cmd_%%i:NAMEDEV=%%i!"
-
-    echo !default_ftp_cmd_%%i! > %root_folder%\tmp\xq3_execute_%%i
-
-    if "%OTHERS_WAIT_CMD_FINISH%" == "True" (
-        start "%%i" /wait cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %%i %remove_logs%"
-    ) else (
-        start "%%i" cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %%i %remove_logs%"
-    )
+    set /a "index_tmp+=1"
 )
+
+:FTP_GET_DEVICE_FINISH
+echo %current_device%
+
+if "%remove_logs%" == "False" (
+    echo %current_device% logs keeping ...
+) else (
+    echo %current_device% logs removing ...
+    start "%current_device%" /wait cmd /c "%root_folder%\cmds\cmd_remove_logs.cmd %current_device%"
+)
+
+if "%testing_direct%" == "DL" (
+    set "default_ftp_cmd_%current_device%=!default_ftp_dl_cmd:FTP_DL_FILENAME=%dl_filename%!"
+) else if "%testing_direct%" == "UL" (
+    set "default_ftp_cmd_%current_device%=!default_ftp_ul_cmd:FTP_UL_FILESIZE=%ul_filesize%!"
+)
+set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:FTP_ACCOUNT=%ftp_account%!"
+set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:FTP_PWD=%ftp_pws%!"
+set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:SERVER_IP=%server_ip%!"
+set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:NAMEDEV=%current_device%!"
+
+if "%GENERAL_LOG_GENERATE%" == "True" (
+    set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:LOG_FILENAME_PRINT=echo $filename >> /xq3_logs_file;!"
+    set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:LOG_PRINT=| tee /data/xq3/$filename; rm FTP_DL_FILENAME!"
+) else (
+    set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:LOG_FILENAME_PRINT=!"
+    set "default_ftp_cmd_%current_device%=!default_ftp_cmd_%current_device%:LOG_PRINT=!"
+)
+
+%root_folder%\adb_tool\adb -s %current_device% shell "echo type=ftp > xq3_execute_config"
+%root_folder%\adb_tool\adb -s %current_device% shell "echo daemon=%run_daemon% >> xq3_execute_config"
+%root_folder%\adb_tool\adb -s %current_device% shell "echo testing_times=%testing_times% >> xq3_execute_config"
+%root_folder%\adb_tool\adb -s %current_device% shell "echo stop_once_disconnect=%stop_once_disconnect% >> xq3_execute_config"
+
+%root_folder%\adb_tool\adb -s %current_device% shell "echo '!default_ftp_cmd_%current_device%!' > xq3_execute.sh"
+
+echo %current_device% start testing !!!
+if "%OTHERS_WAIT_CMD_FINISH%" == "True" (
+    start "%current_device%" /wait cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %current_device% %run_daemon%"
+) else (
+    start "%current_device%" cmd /c "%root_folder%\cmds\cmd_start_testing.cmd %current_device% %run_daemon%"
+)
+
+set /a "index+=1"
+if !index! gtr !need_testing_device_num! goto FTP_FOR_LOOP_FOR_RUN_BREAK
+
+goto FTP_FOR_LOOP_FOR_RUN
+
+:FTP_FOR_LOOP_FOR_RUN_BREAK

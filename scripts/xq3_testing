@@ -1,15 +1,58 @@
 #!/bin/sh
 
+run_script ()
+{
+    run_times_tmp=$(cat /xq3_execute_config | grep testing_times=)
+    stop_once_disconnect_tmp=$(cat /xq3_execute_config | grep stop_once_disconnect=)
+
+    if [ -z "$run_times_tmp" ]; then
+        run_times=0
+    else
+        run_times=$(echo "$run_times_tmp" | cut -d'=' -f 2)
+    fi
+
+    if [ "$run_times" -eq 0 ]; then
+        while true; do
+            . /xq3_execute.sh
+
+            killall iperf3 lftp axel curl ping
+            sleep 5
+
+            if [ "$stop_once_disconnect_tmp" = "False" ]; then
+                continue
+            elif [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then
+                echo "network_disconnect" >> /xq3_logs_file;
+                break
+            fi
+        done
+    else
+        for i in $(seq 1 $run_times); do
+            . /xq3_execute.sh
+
+            killall iperf3 lftp axel curl ping
+            sleep 5
+
+            if [ "$(cat /var/xq3/net_ifstatus_state)" = "0" ]; then
+                echo "network_disconnect" >> /xq3_logs_file;
+                if [ "$stop_once_disconnect_tmp" = "True" ]; then
+                    break
+                fi
+            fi
+        done
+    fi
+}
+
 run_wo_daemon ()
 {
-    . /xq3_execute.sh
+    run_script
 }
 
 run_daemon ()
 {
+    run_script &
+    daemon_pid=$!
     while true; do
-        start-stop-daemon -b -S sh /xq3_execute.sh
-        if [ "$?" = "0" ] || [ ! -z "$(ps | grep xq3_execute | grep -v grep)" ]; then
+        if kill -0 $daemon_pid 2>/dev/null; then
             break
         fi
     done
@@ -20,26 +63,33 @@ run ()
     swapoff -a
     sync
     swapon /dev/zram0
-    
+
+    mkdir /data/xq3
+
     if [ ! -z "$(cat /xq3_execute_config | grep daemon | grep True)" ]; then
-        run_daemon
+        run_script &
+        daemon_pid=$!
+
+        while true; do
+            if ! kill -0 $daemon_pid 2>/dev/null; then
+                echo "finish"
+                break
+            fi
+        done
     else
-        run_wo_daemon
+        run_script
     fi
 }
 
 stop()
 {
-    xq3_execute_pid="$(ps | grep xq3_execute | grep -v grep | awk '{print $1}')"
-    if [ ! -z "$xq3_execute_pid" ]; then
-        kill -9 $xq3_execute_pid
-    fi
-    killall iperf3 lftp axel curl
+    kill -9 $(ps | grep "xq3_testing run" | grep -v grep | awk '{print $1}')
+    killall iperf3 lftp axel curl ping
 }
 
 status()
 {
-    if [ ! -z "$(ps | grep xq3_execute | grep -v grep)" ]; then
+    if [ ! -z "$(ps | grep "xq3_testing run" | grep -v grep)" ]; then
         echo "running"
     else
         echo "stop"

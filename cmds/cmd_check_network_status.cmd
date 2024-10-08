@@ -105,7 +105,7 @@ for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr 
     )
 
     set "devices_testing=0"
-    for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %%a shell ps ^| findstr xq3_execute`) do (
+    for /f "usebackq delims=" %%b in (`%root_folder%\adb_tool\adb -s %%a shell "/etc/init.d/xq3_testing status" ^| findstr running`) do (
         set "devices_testing=1"
     )
 

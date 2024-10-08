@@ -26,7 +26,7 @@ for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr 
     echo %%a
 
     %root_folder%\adb_tool\adb -s %%a shell /etc/init.d/xq3_testing stop
-    %root_folder%\adb_tool\adb -s %%a shell "killall iperf3 lftp axel curl > /dev/null 2>&1"
+    %root_folder%\adb_tool\adb -s %%a shell "killall iperf3 lftp axel curl ping > /dev/null 2>&1"
 )
 
 echo .
@@ -43,7 +43,7 @@ for /f "skip=1 tokens=1" %%a in ('%root_folder%\adb_tool\adb devices ^| findstr 
     echo %%a
 
     %root_folder%\adb_tool\adb -s %%a shell /etc/init.d/xq3_testing stop
-    %root_folder%\adb_tool\adb -s %%a shell "killall iperf3 lftp axel curl > /dev/null 2>&1"
+    %root_folder%\adb_tool\adb -s %%a shell "killall iperf3 lftp axel curl ping > /dev/null 2>&1"
 )
 
 echo CHT adv NT 1-3-1 finish !!!
